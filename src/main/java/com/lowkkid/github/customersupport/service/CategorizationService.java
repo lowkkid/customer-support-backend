@@ -11,6 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,19 +29,22 @@ public class CategorizationService {
         String prompt = buildCombinedPrompt(messageBody);
 
         try {
-            GenerateContentResponse response = geminiClient.models.generateContent(
-                    modelName,
-                    prompt,
-                    null
-            );
+            GenerateContentResponse response = CompletableFuture
+                    .supplyAsync(() -> geminiClient.models.generateContent(modelName, prompt, null))
+                    .get(60, TimeUnit.SECONDS);
 
             String responseText = response.text();
             log.info("Gemini response: {}", responseText);
 
             return parseCombinedResponse(responseText, messageBody);
 
+        } catch (TimeoutException e) {
+            log.warn("Gemini API timed out after 60s, using fallback");
+            Category category = fallbackCategorization(messageBody);
+            Priority priority = fallbackPrioritization(messageBody, category);
+            return new CategoryAndPriority(category, priority);
         } catch (Exception e) {
-            log.error("Error calling Gemini API: {}", e.getMessage(), e);
+            log.error("Error calling Gemini API: {}", e.getMessage());
             Category category = fallbackCategorization(messageBody);
             Priority priority = fallbackPrioritization(messageBody, category);
             return new CategoryAndPriority(category, priority);
@@ -46,33 +53,11 @@ public class CategorizationService {
 
     private String buildCombinedPrompt(String message) {
         return String.format("""
-            You are a customer support triage specialist.
-            
-            Analyze this message and provide:
-            1. Category (BUG, BILLING, FEATURE_REQUEST, or GENERAL)
-            2. Priority (HIGH, MEDIUM, or LOW)
-            
-            Categories:
-            - BUG: Technical issues, crashes, errors, broken features
-            - BILLING: Invoices, payments, charges, refunds, subscriptions
-            - FEATURE_REQUEST: New features, improvements, suggestions
-            - GENERAL: Questions, general inquiries, other
-            
-            Priority Levels:
-            - HIGH: Urgent, critical, blocking, production issues, contains "urgent"/"asap"/"critical"
-            - MEDIUM: Important but not blocking, has workarounds
-            - LOW: Feature requests, general questions, non-urgent
-            
-            Customer Message:
-            "%s"
-            
-            Respond in this EXACT format (two lines):
-            CATEGORY: [category]
-            PRIORITY: [priority]
-            
-            Example:
-            CATEGORY: BUG
-            PRIORITY: HIGH
+            Classify this support message. Reply ONLY two lines:
+            CATEGORY: BUG|BILLING|FEATURE_REQUEST|GENERAL
+            PRIORITY: HIGH|MEDIUM|LOW
+
+            Message: "%s"
             """, message);
     }
 
