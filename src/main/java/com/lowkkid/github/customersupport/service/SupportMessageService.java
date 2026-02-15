@@ -1,5 +1,6 @@
 package com.lowkkid.github.customersupport.service;
 
+import com.lowkkid.github.customersupport.dto.CustomerMessage;
 import com.lowkkid.github.customersupport.dto.SupportMessageDto;
 import com.lowkkid.github.customersupport.mapper.SupportMessageMapper;
 import com.lowkkid.github.customersupport.model.SupportMessage;
@@ -8,6 +9,8 @@ import com.lowkkid.github.customersupport.model.enums.Priority;
 import com.lowkkid.github.customersupport.repository.SupportMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,22 @@ public class SupportMessageService {
 
     private final SupportMessageRepository repository;
     private final SupportMessageMapper mapper;
+    private final CategorizationService categorizationService;
+
+    public SupportMessageDto createMessage(CustomerMessage customerMessage) {
+        CategorizationService.CategoryAndPriority result =
+                categorizationService.categorizeAndPrioritize(customerMessage.messageBody());
+
+        SupportMessage message = new SupportMessage();
+        message.setCustomerName(customerMessage.customerName());
+        message.setMessageBody(customerMessage.messageBody());
+        message.setCategory(result.getCategory());
+        message.setPriority(result.getPriority());
+        message.setResolved(false);
+        message.setCreatedAt(LocalDateTime.now());
+
+        return mapper.toDto(repository.save(message));
+    }
 
     public List<SupportMessageDto> getAllMessages() {
         return mapper.toDtoList(repository.findAll());

@@ -1,11 +1,11 @@
 package com.lowkkid.github.customersupport.controller;
 
+import com.lowkkid.github.customersupport.dto.CustomerMessage;
 import com.lowkkid.github.customersupport.dto.SupportMessageDto;
 import com.lowkkid.github.customersupport.service.SupportMessageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,6 +15,12 @@ import java.util.List;
 public class SupportMessageController {
 
     private final SupportMessageService service;
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public SupportMessageDto createMessage(@RequestBody CustomerMessage customerMessage) {
+        return service.createMessage(customerMessage);
+    }
 
     @GetMapping
     public List<SupportMessageDto> getAllMessages() {

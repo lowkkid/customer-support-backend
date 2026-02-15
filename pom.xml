@@ -29,6 +29,7 @@
     <properties>
         <java.version>25</java.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <google-genai.version>1.39.0</google-genai.version>
     </properties>
     <dependencies>
         <dependency>
@@ -58,12 +59,16 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>${google-genai.version}</version>
         </dependency>
     </dependencies>
 
