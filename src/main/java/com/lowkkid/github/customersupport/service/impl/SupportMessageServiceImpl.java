@@ -1,5 +1,7 @@
 package com.lowkkid.github.customersupport.service.impl;
 
+import com.lowkkid.github.customersupport.domain.projection.CategoryCount;
+import com.lowkkid.github.customersupport.domain.projection.PriorityCount;
 import com.lowkkid.github.customersupport.dto.CustomerMessage;
 import com.lowkkid.github.customersupport.dto.StatsResponse;
 import com.lowkkid.github.customersupport.dto.SupportMessageDto;
@@ -85,10 +87,10 @@ public class SupportMessageServiceImpl implements SupportMessageService {
     @Override
     public StatsResponse getStats() {
         Map<String, Long> byCategory = repository.countUnresolvedByCategory().stream()
-                .collect(Collectors.toMap(c -> c.getCategory().name(), c -> c.getCount()));
+                .collect(Collectors.toMap(c -> c.getCategory().name(), CategoryCount::getCount));
 
         Map<String, Long> byPriority = repository.countUnresolvedByPriority().stream()
-                .collect(Collectors.toMap(p -> p.getPriority().name(), p -> p.getCount()));
+                .collect(Collectors.toMap(p -> p.getPriority().name(), PriorityCount::getCount));
 
         return new StatsResponse(byCategory, byPriority);
     }
