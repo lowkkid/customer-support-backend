@@ -60,7 +60,7 @@ jobs:
             echo "Starting new container..."
             docker run -d \
               --name ${{ env.DOCKER_IMAGE_NAME }}-container \
-              -p 8080:8080 \
+              -p 8082:8082 \
               --env-file .env \
               --restart unless-stopped \
               ${{ env.DOCKER_IMAGE_NAME }}
