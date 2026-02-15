@@ -1,8 +1,8 @@
 package com.lowkkid.github.customersupport.dto;
 
-import com.lowkkid.github.customersupport.model.enums.Category;
-import com.lowkkid.github.customersupport.model.enums.Priority;
-import com.lowkkid.github.customersupport.model.enums.Status;
+import com.lowkkid.github.customersupport.domain.entity.enums.Category;
+import com.lowkkid.github.customersupport.domain.entity.enums.Priority;
+import com.lowkkid.github.customersupport.domain.entity.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

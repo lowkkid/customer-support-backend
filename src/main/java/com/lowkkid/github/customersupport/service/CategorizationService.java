@@ -2,8 +2,8 @@ package com.lowkkid.github.customersupport.service;
 
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
-import com.lowkkid.github.customersupport.model.enums.Category;
-import com.lowkkid.github.customersupport.model.enums.Priority;
+import com.lowkkid.github.customersupport.domain.entity.enums.Category;
+import com.lowkkid.github.customersupport.domain.entity.enums.Priority;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

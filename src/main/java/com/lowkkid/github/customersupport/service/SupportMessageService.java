@@ -3,11 +3,11 @@ package com.lowkkid.github.customersupport.service;
 import com.lowkkid.github.customersupport.dto.CustomerMessage;
 import com.lowkkid.github.customersupport.dto.SupportMessageDto;
 import com.lowkkid.github.customersupport.mapper.SupportMessageMapper;
-import com.lowkkid.github.customersupport.model.SupportMessage;
-import com.lowkkid.github.customersupport.model.enums.Category;
-import com.lowkkid.github.customersupport.model.enums.Priority;
-import com.lowkkid.github.customersupport.model.enums.Status;
-import com.lowkkid.github.customersupport.repository.SupportMessageRepository;
+import com.lowkkid.github.customersupport.domain.entity.SupportMessage;
+import com.lowkkid.github.customersupport.domain.entity.enums.Category;
+import com.lowkkid.github.customersupport.domain.entity.enums.Priority;
+import com.lowkkid.github.customersupport.domain.entity.enums.Status;
+import com.lowkkid.github.customersupport.domain.repository.SupportMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-import java.util.List;
+import com.lowkkid.github.customersupport.dto.StatsResponse;
+
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -77,13 +78,13 @@ public class SupportMessageService {
         return mapper.toDto(repository.save(message));
     }
 
-    public Map<Category, Long> getCountByCategory() {
-        return repository.findAll().stream()
-                .collect(Collectors.groupingBy(SupportMessage::getCategory, Collectors.counting()));
-    }
+    public StatsResponse getStats() {
+        Map<String, Long> byCategory = repository.countUnresolvedByCategory().stream()
+                .collect(Collectors.toMap(c -> c.getCategory().name(), c -> c.getCount()));
 
-    public Map<Priority, Long> getCountByPriority() {
-        return repository.findAll().stream()
-                .collect(Collectors.groupingBy(SupportMessage::getPriority, Collectors.counting()));
+        Map<String, Long> byPriority = repository.countUnresolvedByPriority().stream()
+                .collect(Collectors.toMap(p -> p.getPriority().name(), p -> p.getCount()));
+
+        return new StatsResponse(byCategory, byPriority);
     }
 }

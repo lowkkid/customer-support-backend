@@ -1,4 +1,4 @@
-package com.lowkkid.github.customersupport.model.enums;
+package com.lowkkid.github.customersupport.domain.entity.enums;
 
 public enum Category {
     BUG,
