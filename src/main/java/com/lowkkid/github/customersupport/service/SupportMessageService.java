@@ -6,8 +6,13 @@ import com.lowkkid.github.customersupport.mapper.SupportMessageMapper;
 import com.lowkkid.github.customersupport.model.SupportMessage;
 import com.lowkkid.github.customersupport.model.enums.Category;
 import com.lowkkid.github.customersupport.model.enums.Priority;
+import com.lowkkid.github.customersupport.model.enums.Status;
 import com.lowkkid.github.customersupport.repository.SupportMessageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,14 +38,30 @@ public class SupportMessageService {
         message.setMessageBody(customerMessage.messageBody());
         message.setCategory(result.getCategory());
         message.setPriority(result.getPriority());
-        message.setResolved(false);
+        message.setStatus(Status.UNRESOLVED);
         message.setCreatedAt(LocalDateTime.now());
 
         return mapper.toDto(repository.save(message));
     }
 
-    public List<SupportMessageDto> getAllMessages() {
-        return mapper.toDtoList(repository.findAll());
+    public Page<SupportMessageDto> getAll(
+            Priority priority,
+            Category category,
+            Status status,
+            Integer pageNumber,
+            Integer pageSize,
+            String sortField,
+            Sort.Direction sortDirection
+    ) {
+        Sort sort;
+        if ("priority".equals(sortField)) {
+            sort = JpaSort.unsafe(sortDirection,
+                    "(CASE sm.priority WHEN 'HIGH' THEN 3 WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 1 END)");
+        } else {
+            sort = Sort.by(sortDirection, sortField);
+        }
+        return repository.findAll(priority, category, status,
+                PageRequest.of(pageNumber - 1, pageSize, sort));
     }
 
     public SupportMessageDto getMessageById(Long id) {
@@ -49,33 +70,10 @@ public class SupportMessageService {
         return mapper.toDto(message);
     }
 
-    public List<SupportMessageDto> getMessagesByCategory(Category category) {
-        return mapper.toDtoList(repository.findByCategory(category));
-    }
-
-    public List<SupportMessageDto> getMessagesByPriority(Priority priority) {
-        return mapper.toDtoList(repository.findByPriority(priority));
-    }
-
-    public List<SupportMessageDto> getMessagesByCategoryAndPriority(Category category, Priority priority) {
-        return mapper.toDtoList(repository.findByCategoryAndPriority(category, priority));
-    }
-
-    public List<SupportMessageDto> filterMessages(Category category, Priority priority) {
-        if (category != null && priority != null) {
-            return mapper.toDtoList(repository.findByCategoryAndPriority(category, priority));
-        } else if (category != null) {
-            return mapper.toDtoList(repository.findByCategory(category));
-        } else if (priority != null) {
-            return mapper.toDtoList(repository.findByPriority(priority));
-        }
-        return mapper.toDtoList(repository.findAll());
-    }
-
     public SupportMessageDto markAsResolved(Long id) {
         SupportMessage message = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message not found with id: " + id));
-        message.setResolved(true);
+        message.setStatus(Status.RESOLVED);
         return mapper.toDto(repository.save(message));
     }
 

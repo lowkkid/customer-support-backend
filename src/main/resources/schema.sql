@@ -4,6 +4,6 @@ CREATE TABLE support_message (
     message_body TEXT NOT NULL,
     category VARCHAR(50) NOT NULL,
     priority VARCHAR(20) NOT NULL,
-    resolved BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) DEFAULT 'UNRESOLVED',
     created_at TIMESTAMP NOT NULL
 );

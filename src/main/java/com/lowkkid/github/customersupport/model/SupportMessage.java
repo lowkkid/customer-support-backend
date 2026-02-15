@@ -2,6 +2,7 @@ package com.lowkkid.github.customersupport.model;
 
 import com.lowkkid.github.customersupport.model.enums.Category;
 import com.lowkkid.github.customersupport.model.enums.Priority;
+import com.lowkkid.github.customersupport.model.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,8 +37,9 @@ public class SupportMessage {
     @Column(name = "priority", nullable = false, length = 20)
     private Priority priority;
 
-    @Column(name = "resolved", nullable = false)
-    private boolean resolved = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private Status status = Status.UNRESOLVED;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
