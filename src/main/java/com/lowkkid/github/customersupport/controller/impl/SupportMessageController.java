@@ -1,5 +1,6 @@
-package com.lowkkid.github.customersupport.controller;
+package com.lowkkid.github.customersupport.controller.impl;
 
+import com.lowkkid.github.customersupport.controller.SupportMessageApi;
 import com.lowkkid.github.customersupport.dto.CustomerMessage;
 import com.lowkkid.github.customersupport.dto.StatsResponse;
 import com.lowkkid.github.customersupport.dto.SupportMessageDto;
@@ -17,14 +18,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/messages")
 @RequiredArgsConstructor
-public class SupportMessageController {
+public class SupportMessageController implements SupportMessageApi {
 
     private final SupportMessageService service;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public SupportMessageDto createMessage(@RequestBody CustomerMessage customerMessage) {
-        return service.createMessage(customerMessage);
+    public ResponseEntity<SupportMessageDto> createMessage(@RequestBody CustomerMessage customerMessage) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.createMessage(customerMessage));
     }
 
     @GetMapping

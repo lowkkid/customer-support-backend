@@ -10,6 +10,4 @@ import java.util.List;
 public interface SupportMessageMapper {
 
     SupportMessageDto toDto(SupportMessage entity);
-
-    List<SupportMessageDto> toDtoList(List<SupportMessage> entities);
 }
