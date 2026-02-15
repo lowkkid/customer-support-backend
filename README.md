@@ -39,7 +39,7 @@ Quick examples:
 curl https://customer-support-backend.lowkkid.dev/messages
 
 # Get statistics
-curl https://customer-support-backend.lowkkid.dev/stats
+curl https://customer-support-backend.lowkkid.dev/messages/stats
 
 # Create a new message (may take ~30-60s due to synchronous LLM call)
 curl -X POST https://customer-support-backend.lowkkid.dev/messages \
