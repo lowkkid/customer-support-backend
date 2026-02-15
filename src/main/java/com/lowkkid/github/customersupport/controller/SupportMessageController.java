@@ -41,4 +41,14 @@ public class SupportMessageController {
         var messages = service.getAll(priority, category, status, pageNumber, pageSize, sortField, sortDirection);
         return ResponseEntity.ok(messages);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<SupportMessageDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getMessageById(id));
+    }
+
+    @PatchMapping("/{id}/resolve")
+    public ResponseEntity<SupportMessageDto> markAsResolved(@PathVariable Long id) {
+        return ResponseEntity.ok(service.markAsResolved(id));
+    }
 }
